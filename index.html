@@ -28,7 +28,7 @@
       padding:16px;
       margin-bottom:16px;
     }
-    label { color:#cbd5f5; }
+    label { color:#cbd5f5; display:block; margin-bottom:6px; }
     input[type=text] {
       width:100%;
       padding:10px;
@@ -36,6 +36,7 @@
       border:1px solid #1e293b;
       background:#020617;
       color:#e5e7eb;
+      margin-bottom:10px;
     }
 
     input[type=number] {
@@ -59,7 +60,6 @@
       font-size:0.9rem;
       text-align:left;
     }
-    th { color:#94a3b8; font-size:0.9rem; }
     .toggle { display:flex; gap:20px; justify-content:center; }
     .total { font-size:1.6rem; text-align:center; }
     button {
@@ -78,7 +78,13 @@
 
   <div class="card">
     <label>Nome do Cliente</label>
-    <input type="text" id="cliente" placeholder="Ex: Joãozinho" />
+    <input type="text" id="cliente" placeholder="Ex: Joaozinho" />
+
+    <label>Telefone</label>
+    <input type="text" id="telefone" placeholder="000-000" />
+
+    <label>Área</label>
+    <input type="text" id="area" placeholder="Bahamas - 12" />
   </div>
 
   <div class="card toggle">
@@ -110,7 +116,6 @@
 
 <script>
 const data = [
-  // valores em reais (ex: 40000 = 40.000)
   {name:'Algema', min:40000, max:50000},
   {name:'C4', min:20000, max:35000},
   {name:'Capuz', min:20000, max:30000},
@@ -125,14 +130,12 @@ const data = [
   {name:'Rádio', min:3000, max:4000},
   {name:'Rastreador', min:90000, max:100000},
   {name:'Roupas', min:3000, max:4000}
-];
+].sort((a,b)=>a.name.localeCompare(b.name));
 
 const tbody = document.getElementById('items');
 const totalEl = document.getElementById('total');
 
-function format(value){
-  return value.toLocaleString('pt-BR');
-}
+function format(value){ return value.toLocaleString('pt-BR'); }
 
 function price(item){
   return document.querySelector('input[name=parceria]:checked').value === 'min'
@@ -145,7 +148,7 @@ function render(){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${item.name}</td>
-      <td><input type="number" min="0" placeholder="0" class="qty"></td>
+      <td><input type="number" min="0" placeholder="" class="qty"></td>
       <td class="price">${format(price(item))}</td>
       <td class="sub">0</td>
     `;
@@ -167,16 +170,49 @@ function calc(){
 }
 
 function copiarResumo(){
-  let texto = `📦 Encomenda - Bahamas\nCliente: ${document.getElementById('cliente').value || 'Não informado'}\n\n`;
+  const cliente = document.getElementById('cliente').value || 'Não informado';
+  const telefone = document.getElementById('telefone').value || 'Não informado';
+  const area = document.getElementById('area').value || 'Não informado';
+
+  let texto = `📦 Encomenda - Bahamas
+`;
+  texto += `Cliente: ${cliente}
+`;
+  texto += `Telefone: ${telefone}
+`;
+  texto += `Área: ${area}
+
+`;
+
   document.querySelectorAll('#items tr').forEach(tr => {
     const item = tr.children[0].innerText;
     const qtd = tr.querySelector('.qty').value;
     const sub = tr.querySelector('.sub').innerText;
-    if(qtd > 0) texto += `• ${item}: ${qtd} | ${sub}k\n`;
+    if(qtd > 0) texto += `• ${item}: ${qtd} | ${sub}
+`;
   });
-  texto += `\n💰 Total: ${totalEl.innerText}k`;
-  navigator.clipboard.writeText(texto);
-  alert('Resumo copiado!');
+
+  texto += `
+💰 Total: ${totalEl.innerText}`;
+
+  // copia imediatamente
+  navigator.clipboard.writeText(texto).then(() => {
+    const aviso = document.createElement('div');
+    aviso.innerText = 'Resumo copiado com sucesso!';
+    aviso.style.position = 'fixed';
+    aviso.style.bottom = '20px';
+    aviso.style.left = '50%';
+    aviso.style.transform = 'translateX(-50%)';
+    aviso.style.background = '#16a34a';
+    aviso.style.color = 'white';
+    aviso.style.padding = '10px 16px';
+    aviso.style.borderRadius = '12px';
+    aviso.style.boxShadow = '0 10px 30px rgba(0,0,0,.5)';
+    aviso.style.zIndex = '9999';
+    document.body.appendChild(aviso);
+
+    setTimeout(() => aviso.remove(), 2000);
+  });
 }
 
 render();
