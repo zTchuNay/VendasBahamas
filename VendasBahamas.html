@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bahamas - Tablet de Vendas</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      padding: 20px;
+    }
+    .tablet {
+      max-width: 900px;
+      margin: auto;
+      background: #020617;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 0 0 6px #0f172a, 0 30px 60px rgba(0,0,0,.7);
+    }
+    h1 { text-align:center; margin-bottom:4px; }
+    .subtitle { text-align:center; color:#94a3b8; margin-bottom:16px; }
+    .card {
+      background:#020617;
+      border:1px solid #1e293b;
+      border-radius:16px;
+      padding:16px;
+      margin-bottom:16px;
+    }
+    label { color:#cbd5f5; }
+    input[type=text] {
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid #1e293b;
+      background:#020617;
+      color:#e5e7eb;
+    }
+
+    input[type=number] {
+      width:80px;
+      padding:8px;
+      border-radius:10px;
+      border:1px solid #1e293b;
+      background:#020617;
+      color:#e5e7eb;
+      text-align:left;
+    }
+    table { width:100%; border-collapse:collapse; }
+    th, td {
+      padding:10px;
+      border-bottom:1px solid #1e293b;
+      text-align:left;
+    }
+
+    th {
+      color:#94a3b8;
+      font-size:0.9rem;
+      text-align:left;
+    }
+    th { color:#94a3b8; font-size:0.9rem; }
+    .toggle { display:flex; gap:20px; justify-content:center; }
+    .total { font-size:1.6rem; text-align:center; }
+    button {
+      width:100%; padding:12px; border-radius:14px; border:none;
+      background:#2563eb; color:white; font-size:1rem; cursor:pointer;
+    }
+    button:hover { background:#1d4ed8; }
+    .footer { text-align:center; font-size:0.8rem; color:#94a3b8; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<div class="tablet">
+  <h1>BAHAMAS</h1>
+  <div class="subtitle">Tablet de Vendas & Encomendas</div>
+
+  <div class="card">
+    <label>Nome do Cliente</label>
+    <input type="text" id="cliente" placeholder="Ex: Joãozinho" />
+  </div>
+
+  <div class="card toggle">
+    <label><input type="radio" name="parceria" value="min" checked> Com parceria</label>
+    <label><input type="radio" name="parceria" value="max"> Sem parceria</label>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qtd</th>
+          <th>Preço</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="items"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="total">Total: R$ <span id="total">0</span></div>
+  </div>
+
+  <button onclick="copiarResumo()">📋 Copiar resumo da venda</button>
+  <div class="footer">Bahamas © GTA RP</div>
+</div>
+
+<script>
+const data = [
+  // valores em reais (ex: 40000 = 40.000)
+  {name:'Algema', min:40000, max:50000},
+  {name:'C4', min:20000, max:35000},
+  {name:'Capuz', min:20000, max:30000},
+  {name:'Celular', min:3000, max:4000},
+  {name:'Keycard', min:40000, max:50000},
+  {name:'Laço', min:20000, max:30000},
+  {name:'Lockpick', min:30000, max:40000},
+  {name:'Masterpick', min:70000, max:80000},
+  {name:'Máscara', min:15000, max:25000},
+  {name:'Mochila', min:3000, max:4000},
+  {name:'Placa', min:30000, max:40000},
+  {name:'Rádio', min:3000, max:4000},
+  {name:'Rastreador', min:90000, max:100000},
+  {name:'Roupas', min:3000, max:4000}
+];
+
+const tbody = document.getElementById('items');
+const totalEl = document.getElementById('total');
+
+function format(value){
+  return value.toLocaleString('pt-BR');
+}
+
+function price(item){
+  return document.querySelector('input[name=parceria]:checked').value === 'min'
+    ? item.min : item.max;
+}
+
+function render(){
+  tbody.innerHTML = '';
+  data.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.name}</td>
+      <td><input type="number" min="0" placeholder="0" class="qty"></td>
+      <td class="price">${format(price(item))}</td>
+      <td class="sub">0</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function calc(){
+  let total = 0;
+  document.querySelectorAll('#items tr').forEach((tr, i) => {
+    const qty = Number(tr.querySelector('.qty').value || 0);
+    const p = price(data[i]);
+    const sub = qty * p;
+    tr.querySelector('.price').innerText = format(p);
+    tr.querySelector('.sub').innerText = format(sub);
+    total += sub;
+  });
+  totalEl.innerText = format(total);
+}
+
+function copiarResumo(){
+  let texto = `📦 Encomenda - Bahamas\nCliente: ${document.getElementById('cliente').value || 'Não informado'}\n\n`;
+  document.querySelectorAll('#items tr').forEach(tr => {
+    const item = tr.children[0].innerText;
+    const qtd = tr.querySelector('.qty').value;
+    const sub = tr.querySelector('.sub').innerText;
+    if(qtd > 0) texto += `• ${item}: ${qtd} | ${sub}k\n`;
+  });
+  texto += `\n💰 Total: ${totalEl.innerText}k`;
+  navigator.clipboard.writeText(texto);
+  alert('Resumo copiado!');
+}
+
+render();
+calc();
+
+document.addEventListener('input', calc);
+document.querySelectorAll('input[name=parceria]').forEach(r => r.addEventListener('change', calc));
+</script>
+
+</body>
+</html>
