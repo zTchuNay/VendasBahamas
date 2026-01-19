@@ -6,6 +6,11 @@
 <title>Bahamas - Tablet de Vendas</title>
 
 <style>
+* {
+  box-sizing: border-box;
+}
+
+
 body{
   font-family:'Segoe UI', Arial, sans-serif;
   background:#020617;
@@ -77,6 +82,10 @@ button{
   cursor:pointer;
 }
 button:hover{background:#1d4ed8;}
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
 
 .btnrow{
   display:flex;
@@ -101,13 +110,12 @@ pre{
   margin-top:10px;
 }
 
-/* TOAST CENTRAL INFERIOR */
+/* TOAST (central inferior) */
 .toast{
   position:fixed;
   bottom:25px;
   left:50%;
   transform:translateX(-50%) translateY(20px);
-  background:#16a34a;
   color:white;
   padding:14px 24px;
   border-radius:16px;
@@ -118,11 +126,65 @@ pre{
   transition:all .3s ease;
   z-index:9999;
 }
-
 .toast.show{
   opacity:1;
   transform:translateX(-50%) translateY(0);
 }
+.toast.success{ background:#16a34a; }
+.toast.error{ background:#dc2626; }
+.toast.warn{ background:#f59e0b; color:#111827; }
+
+/* MODAL */
+.modalOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9998;
+  padding:16px;
+}
+.modal{
+  width:100%;
+  max-width:520px;
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.65);
+  padding:16px;
+}
+.modal h3{
+  margin:0 0 8px;
+}
+.modal p{
+  margin:0 0 12px;
+  color:#cbd5f5;
+  line-height:1.35;
+}
+.modal .hint{
+  color:#94a3b8;
+  font-size:.9rem;
+  margin-top:6px;
+}
+.modalActions{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.modalActions button{
+  flex:1 1 50%;
+  margin:0;
+}
+.btnGhost{
+  background:#0b1220;
+  border:1px solid #1e293b;
+}
+.btnGhost:hover{ background:#0f172a; }
+.btnDanger{
+  background:#ef4444;
+}
+.btnDanger:hover{ background:#dc2626; }
 </style>
 </head>
 
@@ -177,6 +239,7 @@ pre{
   <div class="card">
     <div class="btnrow">
       <button onclick="copiarResumo()">📋 Copiar Encomenda</button>
+      <button id="btnRegistrar" onclick="abrirConfirmacaoRegistro()">📨 Registrar Encomenda</button>
       <button onclick="copiarMateriais()">🧰 Copiar Fabricação</button>
     </div>
   </div>
@@ -184,7 +247,28 @@ pre{
   <div class="footer">Bahamas © GTA RP</div>
 </div>
 
-<div id="toast" class="toast">Copiado com sucesso ✔️</div>
+<!-- TOAST -->
+<div id="toast" class="toast success">OK</div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div id="modalOverlay" class="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <h3 id="modalTitle">Confirmar registro da encomenda</h3>
+    <p>
+      Tem certeza? Isso irá <b>registrar a encomenda</b> no Discord e a equipe iniciará a <b>fabricação</b>.
+    </p>
+
+    <label style="margin-top:6px">Vendedor (obrigatório)</label>
+    <input type="text" id="vendedor" placeholder="Ex: Tchu Nay" />
+
+    <div class="hint">Dica: use seu nome do RP para ficar padrão no registro.</div>
+
+    <div class="modalActions">
+      <button class="btnGhost" onclick="fecharConfirmacaoRegistro()">Cancelar</button>
+      <button id="btnConfirmarRegistro" class="btnDanger" onclick="confirmarRegistroDiscord()" disabled>Confirmar e Registrar</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const data = [
@@ -197,12 +281,12 @@ const data = [
   { name:'Lockpick', min:30000, max:40000, mat:{ plastico:4, prata:4 } },
   { name:'Masterpick', min:70000, max:80000, mat:{ ouro:4, plastico:4 } },
   { name:'Máscara', min:15000, max:25000, mat:{ tecido:8, fio:5 } },
-  { 
-    name:'Mochila', 
-    min:3000, 
-    max:4000, 
+  {
+    name:'Mochila',
+    min:3000,
+    max:4000,
     mat:{ tecido:2, fio:4 },
-    craftQtd: 2   // 🔥 cada craft gera 2 mochilas
+    craftQtd: 2 // cada craft gera 2 mochilas
   },
   { name:'Placa', min:30000, max:40000, mat:{ plastico:4, aluminio:5 } },
   { name:'Rádio', min:3000, max:4000, mat:{ plastico:3, chip:2 } },
@@ -213,12 +297,19 @@ const data = [
 const tbody = document.getElementById('items');
 const totalEl = document.getElementById('total');
 const materiaisTexto = document.getElementById('materiaisTexto');
+
 const toast = document.getElementById('toast');
+const modalOverlay = document.getElementById('modalOverlay');
+const vendedorEl = document.getElementById('vendedor');
+const btnConfirmarRegistro = document.getElementById('btnConfirmarRegistro');
+const btnRegistrar = document.getElementById('btnRegistrar');
 
 function format(v){ return v.toLocaleString('pt-BR'); }
 
-function showToast(text){
+function showToast(text, type='success'){
   toast.innerText = text;
+  toast.classList.remove('success','error','warn');
+  toast.classList.add(type);
   toast.classList.add('show');
   setTimeout(()=>toast.classList.remove('show'),2000);
 }
@@ -252,28 +343,48 @@ function buildMateriaisText(){
     const item = data[i];
     const receita = item.mat || {};
 
-    // Quantos crafts são necessários
-    // Se tiver craftQtd (ex: Mochila = 2 por craft), usa arredondamento pra cima
+    // crafts necessários (ex: mochila 2 por craft)
     const crafts = item.craftQtd ? Math.ceil(qtd / item.craftQtd) : qtd;
 
     for(const m in receita){
-      totalMat[m] = (totalMat[m] || 0) + (receita[m] * crafts);
+      totalMat[m]=(totalMat[m]||0)+(receita[m]*crafts);
     }
   });
 
   let texto = '🛠️ Fabricação — Bahamas\n\n';
   const mats = Object.keys(totalMat);
-
-  if(mats.length === 0){
-    texto += '• (nenhum item selecionado)';
-    return texto;
-  }
+  if(mats.length===0) return texto+'• (nenhum item selecionado)';
 
   mats.sort().forEach(m=>{
-    texto += `• ${m}: ${totalMat[m]}\n`;
+    texto+=`• ${m}: ${totalMat[m]}\n`;
   });
 
   return texto.trimEnd();
+}
+
+function buildEncomendaText(vendedorNome){
+  const cliente = document.getElementById('cliente').value || 'Não informado';
+  const telefone = document.getElementById('telefone').value || 'Não informado';
+  const area = document.getElementById('area').value || 'Não informado';
+  const vendedor = (vendedorNome && vendedorNome.trim()) ? vendedorNome.trim() : null;
+
+  let texto = `📦 Encomenda - Bahamas\n`;
+  if(vendedor) texto += `Vendedor: ${vendedor}\n`;
+  texto += `Cliente: ${cliente}\nTelefone: ${telefone}\nÁrea: ${area}\n\n`;
+
+  let temItem=false;
+  document.querySelectorAll('#items tr').forEach(tr=>{
+    const qtd = Number(tr.querySelector('.qty').value||0);
+    if(qtd>0){
+      temItem=true;
+      texto += `• ${tr.children[0].innerText}: ${qtd} | ${tr.querySelector('.sub').innerText}\n`;
+    }
+  });
+
+  if(!temItem) texto += '• (nenhum item selecionado)\n';
+
+  texto += `\n💰 Total: ${totalEl.innerText}`;
+  return texto;
 }
 
 function calc(){
@@ -293,32 +404,86 @@ function calc(){
 }
 
 function copiarResumo(){
-  const cliente = document.getElementById('cliente').value || 'Não informado';
-  const telefone = document.getElementById('telefone').value || 'Não informado';
-  const area = document.getElementById('area').value || 'Não informado';
-
-  let texto = `📦 Encomenda - Bahamas\nCliente: ${cliente}\nTelefone: ${telefone}\nÁrea: ${area}\n\n`;
-
-  let temItem=false;
-  document.querySelectorAll('#items tr').forEach(tr=>{
-    const qtd = Number(tr.querySelector('.qty').value||0);
-    if(qtd>0){
-      temItem=true;
-      texto += `• ${tr.children[0].innerText}: ${qtd} | ${tr.querySelector('.sub').innerText}\n`;
-    }
-  });
-
-  if(!temItem) texto += '• (nenhum item selecionado)\n';
-
-  texto += `\n💰 Total: ${totalEl.innerText}`;
-
-  navigator.clipboard.writeText(texto);
-  showToast('Encomenda copiada ✔️');
+  // Copia sem vendedor (pra uso rápido). Registro no Discord exige vendedor.
+  navigator.clipboard.writeText(buildEncomendaText(''));
+  showToast('Encomenda copiada ✔️', 'success');
 }
 
 function copiarMateriais(){
   navigator.clipboard.writeText(buildMateriaisText());
-  showToast('Fabricação copiada ✔️');
+  showToast('Fabricação copiada ✔️', 'success');
+}
+
+/* ====== MODAL: CONFIRMAÇÃO ====== */
+function abrirConfirmacaoRegistro(){
+  vendedorEl.value = '';
+  btnConfirmarRegistro.disabled = true;
+  modalOverlay.style.display = 'flex';
+  vendedorEl.focus();
+}
+
+function fecharConfirmacaoRegistro(){
+  modalOverlay.style.display = 'none';
+}
+
+vendedorEl.addEventListener('input', () => {
+  btnConfirmarRegistro.disabled = vendedorEl.value.trim().length === 0;
+});
+
+// Fecha ao clicar fora do modal
+modalOverlay.addEventListener('click', (e) => {
+  if(e.target === modalOverlay) fecharConfirmacaoRegistro();
+});
+
+// Fecha com ESC
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && modalOverlay.style.display === 'flex') fecharConfirmacaoRegistro();
+});
+
+/* ====== DISCORD: REGISTRO ====== */
+async function confirmarRegistroDiscord(){
+  const vendedor = vendedorEl.value.trim();
+  if(!vendedor){
+    showToast('Informe o vendedor (obrigatório).', 'warn');
+    vendedorEl.focus();
+    return;
+  }
+
+  // opcional: evita registrar “em branco”
+  let temItem = false;
+  document.querySelectorAll('#items tr').forEach(tr=>{
+    const qtd = Number(tr.querySelector('.qty').value||0);
+    if(qtd>0) temItem = true;
+  });
+  if(!temItem){
+    showToast('Selecione ao menos 1 item antes de registrar.', 'warn');
+    return;
+  }
+
+  btnConfirmarRegistro.disabled = true;
+  btnRegistrar.disabled = true;
+
+  const texto = buildEncomendaText(vendedor);
+
+  try{
+    const r = await fetch('/api/registrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: "```" + texto + "```" })
+    });
+
+    if(!r.ok){
+      throw new Error('Falha ao registrar no Discord');
+    }
+
+    fecharConfirmacaoRegistro();
+    showToast('Encomenda registrada no Discord ✔️', 'success');
+  }catch(e){
+    showToast('Erro ao enviar pro Discord ❌', 'error');
+    btnConfirmarRegistro.disabled = false; // permite tentar de novo
+  }finally{
+    btnRegistrar.disabled = false;
+  }
 }
 
 render();
