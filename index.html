@@ -1,90 +1,146 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bahamas - Tablet de Vendas</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #020617;
-      color: #e5e7eb;
-      padding: 20px;
-    }
-    .tablet {
-      max-width: 900px;
-      margin: auto;
-      background: #020617;
-      border-radius: 24px;
-      padding: 20px;
-      box-shadow: 0 0 0 6px #0f172a, 0 30px 60px rgba(0,0,0,.7);
-    }
-    h1 { text-align:center; margin-bottom:4px; }
-    .subtitle { text-align:center; color:#94a3b8; margin-bottom:16px; }
-    .card {
-      background:#020617;
-      border:1px solid #1e293b;
-      border-radius:16px;
-      padding:16px;
-      margin-bottom:16px;
-    }
-    label { color:#cbd5f5; display:block; margin-bottom:6px; }
-    input[type=text] {
-      width:100%;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid #1e293b;
-      background:#020617;
-      color:#e5e7eb;
-      margin-bottom:10px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bahamas - Tablet de Vendas</title>
 
-    input[type=number] {
-      width:80px;
-      padding:8px;
-      border-radius:10px;
-      border:1px solid #1e293b;
-      background:#020617;
-      color:#e5e7eb;
-      text-align:left;
-    }
-    table { width:100%; border-collapse:collapse; }
-    th, td {
-      padding:10px;
-      border-bottom:1px solid #1e293b;
-      text-align:left;
-    }
+<style>
+body{
+  font-family:'Segoe UI', Arial, sans-serif;
+  background:#020617;
+  color:#e5e7eb;
+  padding:20px;
+}
 
-    th {
-      color:#94a3b8;
-      font-size:0.9rem;
-      text-align:left;
-    }
-    .toggle { display:flex; gap:20px; justify-content:center; }
-    .total { font-size:1.6rem; text-align:center; }
-    button {
-      width:100%; padding:12px; border-radius:14px; border:none;
-      background:#2563eb; color:white; font-size:1rem; cursor:pointer;
-    }
-    button:hover { background:#1d4ed8; }
-    .footer { text-align:center; font-size:0.8rem; color:#94a3b8; margin-top:10px; }
-  </style>
+.tablet{
+  max-width:900px;
+  margin:auto;
+  background:#020617;
+  border-radius:24px;
+  padding:20px;
+  box-shadow:0 0 0 6px #0f172a, 0 30px 60px rgba(0,0,0,.7);
+}
+
+h1{text-align:center;margin-bottom:4px;}
+.subtitle{text-align:center;color:#94a3b8;margin-bottom:16px;}
+
+.card{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+label{color:#cbd5f5;}
+
+input[type=text], input[type=number]{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:#e5e7eb;
+}
+
+input[type=number]{width:80px;text-align:left;}
+
+table{width:100%;border-collapse:collapse;}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #1e293b;
+  text-align:left;
+}
+th{color:#94a3b8;font-size:0.9rem;}
+
+.toggle{
+  display:flex;
+  gap:20px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.total{
+  font-size:1.6rem;
+  text-align:center;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  background:#2563eb;
+  color:white;
+  font-size:1rem;
+  cursor:pointer;
+}
+button:hover{background:#1d4ed8;}
+
+.btnrow{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.btnrow button{flex:1 1 240px;}
+
+pre{
+  white-space:pre-wrap;
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:12px;
+  font-size:0.9rem;
+}
+
+.footer{
+  text-align:center;
+  font-size:0.8rem;
+  color:#94a3b8;
+  margin-top:10px;
+}
+
+/* TOAST CENTRAL INFERIOR */
+.toast{
+  position:fixed;
+  bottom:25px;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#16a34a;
+  color:white;
+  padding:14px 24px;
+  border-radius:16px;
+  font-size:1rem;
+  font-weight:500;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+  opacity:0;
+  transition:all .3s ease;
+  z-index:9999;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+</style>
 </head>
+
 <body>
 
 <div class="tablet">
   <h1>BAHAMAS</h1>
-  <div class="subtitle">Tablet de Vendas & Encomendas</div>
+  <div class="subtitle">Tablet de Vendas & Fabricação</div>
 
   <div class="card">
     <label>Nome do Cliente</label>
-    <input type="text" id="cliente" placeholder="Ex: Joaozinho" />
+    <input type="text" id="cliente" placeholder="Ex: TchuNay">
 
-    <label>Telefone</label>
-    <input type="text" id="telefone" placeholder="000-000" />
+    <label style="margin-top:10px">Telefone</label>
+    <input type="text" id="telefone" placeholder="000-000">
 
-    <label>Área</label>
-    <input type="text" id="area" placeholder="Bahamas - 12" />
+    <label style="margin-top:10px">Área</label>
+    <input type="text" id="area" placeholder="Bahamas - 12">
   </div>
 
   <div class="card toggle">
@@ -110,32 +166,62 @@
     <div class="total">Total: R$ <span id="total">0</span></div>
   </div>
 
-  <button onclick="copiarResumo()">📋 Copiar resumo da venda</button>
+  <div class="card">
+    <h3>🛠️ Materiais necessários (Craft)</h3>
+    <pre id="materiaisTexto"></pre>
+    <div style="color:#94a3b8;font-size:0.85rem;margin-top:6px;">
+      * Mochila: cada craft gera 2 unidades (o cálculo já considera isso).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="btnrow">
+      <button onclick="copiarResumo()">📋 Copiar Encomenda</button>
+      <button onclick="copiarMateriais()">🧰 Copiar Fabricação</button>
+    </div>
+  </div>
+
   <div class="footer">Bahamas © GTA RP</div>
 </div>
 
+<div id="toast" class="toast">Copiado com sucesso ✔️</div>
+
 <script>
 const data = [
-  {name:'Algema', min:40000, max:50000},
-  {name:'C4', min:20000, max:35000},
-  {name:'Capuz', min:20000, max:30000},
-  {name:'Celular', min:3000, max:4000},
-  {name:'Keycard', min:40000, max:50000},
-  {name:'Laço', min:20000, max:30000},
-  {name:'Lockpick', min:30000, max:40000},
-  {name:'Masterpick', min:70000, max:80000},
-  {name:'Máscara', min:15000, max:25000},
-  {name:'Mochila', min:3000, max:4000},
-  {name:'Placa', min:30000, max:40000},
-  {name:'Rádio', min:3000, max:4000},
-  {name:'Rastreador', min:90000, max:100000},
-  {name:'Roupas', min:3000, max:4000}
+  { name:'Algema', min:40000, max:50000, mat:{ fio:3, prata:3 } },
+  { name:'C4', min:20000, max:35000, mat:{ polvora:8, plastico:8 } },
+  { name:'Capuz', min:20000, max:30000, mat:{ tecido:10, fio:4 } },
+  { name:'Celular', min:3000, max:4000, mat:{ plastico:2, chip:3 } },
+  { name:'Keycard', min:40000, max:50000, mat:{ plastico:12, chip:9 } },
+  { name:'Laço', min:20000, max:30000, mat:{ tecido:8, fio:4 } },
+  { name:'Lockpick', min:30000, max:40000, mat:{ plastico:4, prata:4 } },
+  { name:'Masterpick', min:70000, max:80000, mat:{ ouro:4, plastico:4 } },
+  { name:'Máscara', min:15000, max:25000, mat:{ tecido:8, fio:5 } },
+  { 
+    name:'Mochila', 
+    min:3000, 
+    max:4000, 
+    mat:{ tecido:2, fio:4 },
+    craftQtd: 2   // 🔥 cada craft gera 2 mochilas
+  },
+  { name:'Placa', min:30000, max:40000, mat:{ plastico:4, aluminio:5 } },
+  { name:'Rádio', min:3000, max:4000, mat:{ plastico:3, chip:2 } },
+  { name:'Rastreador', min:90000, max:100000, mat:{ chip:9, aluminio:12 } },
+  { name:'Roupas', min:3000, max:4000, mat:{ tecido:3, fio:3 } }
 ].sort((a,b)=>a.name.localeCompare(b.name));
 
 const tbody = document.getElementById('items');
 const totalEl = document.getElementById('total');
+const materiaisTexto = document.getElementById('materiaisTexto');
+const toast = document.getElementById('toast');
 
-function format(value){ return value.toLocaleString('pt-BR'); }
+function format(v){ return v.toLocaleString('pt-BR'); }
+
+function showToast(text){
+  toast.innerText = text;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
+}
 
 function price(item){
   return document.querySelector('input[name=parceria]:checked').value === 'min'
@@ -143,12 +229,12 @@ function price(item){
 }
 
 function render(){
-  tbody.innerHTML = '';
-  data.forEach(item => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
+  tbody.innerHTML='';
+  data.forEach(item=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
       <td>${item.name}</td>
-      <td><input type="number" min="0" placeholder="" class="qty"></td>
+      <td><input type="number" min="0" class="qty"></td>
       <td class="price">${format(price(item))}</td>
       <td class="sub">0</td>
     `;
@@ -156,17 +242,54 @@ function render(){
   });
 }
 
+function buildMateriaisText(){
+  let totalMat={};
+
+  document.querySelectorAll('#items tr').forEach((tr,i)=>{
+    const qtd = Number(tr.querySelector('.qty').value||0);
+    if(qtd<=0) return;
+
+    const item = data[i];
+    const receita = item.mat || {};
+
+    // Quantos crafts são necessários
+    // Se tiver craftQtd (ex: Mochila = 2 por craft), usa arredondamento pra cima
+    const crafts = item.craftQtd ? Math.ceil(qtd / item.craftQtd) : qtd;
+
+    for(const m in receita){
+      totalMat[m] = (totalMat[m] || 0) + (receita[m] * crafts);
+    }
+  });
+
+  let texto = '🛠️ Fabricação — Bahamas\n\n';
+  const mats = Object.keys(totalMat);
+
+  if(mats.length === 0){
+    texto += '• (nenhum item selecionado)';
+    return texto;
+  }
+
+  mats.sort().forEach(m=>{
+    texto += `• ${m}: ${totalMat[m]}\n`;
+  });
+
+  return texto.trimEnd();
+}
+
 function calc(){
-  let total = 0;
-  document.querySelectorAll('#items tr').forEach((tr, i) => {
-    const qty = Number(tr.querySelector('.qty').value || 0);
+  let total=0;
+  document.querySelectorAll('#items tr').forEach((tr,i)=>{
+    const qtd = Number(tr.querySelector('.qty').value||0);
     const p = price(data[i]);
-    const sub = qty * p;
+    const sub = qtd*p;
+
     tr.querySelector('.price').innerText = format(p);
     tr.querySelector('.sub').innerText = format(sub);
-    total += sub;
+    total+=sub;
   });
+
   totalEl.innerText = format(total);
+  materiaisTexto.innerText = buildMateriaisText();
 }
 
 function copiarResumo(){
@@ -174,52 +297,34 @@ function copiarResumo(){
   const telefone = document.getElementById('telefone').value || 'Não informado';
   const area = document.getElementById('area').value || 'Não informado';
 
-  let texto = `📦 Encomenda - Bahamas
-`;
-  texto += `Cliente: ${cliente}
-`;
-  texto += `Telefone: ${telefone}
-`;
-  texto += `Área: ${area}
+  let texto = `📦 Encomenda - Bahamas\nCliente: ${cliente}\nTelefone: ${telefone}\nÁrea: ${area}\n\n`;
 
-`;
-
-  document.querySelectorAll('#items tr').forEach(tr => {
-    const item = tr.children[0].innerText;
-    const qtd = tr.querySelector('.qty').value;
-    const sub = tr.querySelector('.sub').innerText;
-    if(qtd > 0) texto += `• ${item}: ${qtd} | ${sub}
-`;
+  let temItem=false;
+  document.querySelectorAll('#items tr').forEach(tr=>{
+    const qtd = Number(tr.querySelector('.qty').value||0);
+    if(qtd>0){
+      temItem=true;
+      texto += `• ${tr.children[0].innerText}: ${qtd} | ${tr.querySelector('.sub').innerText}\n`;
+    }
   });
 
-  texto += `
-💰 Total: ${totalEl.innerText}`;
+  if(!temItem) texto += '• (nenhum item selecionado)\n';
 
-  // copia imediatamente
-  navigator.clipboard.writeText(texto).then(() => {
-    const aviso = document.createElement('div');
-    aviso.innerText = 'Resumo copiado com sucesso!';
-    aviso.style.position = 'fixed';
-    aviso.style.bottom = '20px';
-    aviso.style.left = '50%';
-    aviso.style.transform = 'translateX(-50%)';
-    aviso.style.background = '#16a34a';
-    aviso.style.color = 'white';
-    aviso.style.padding = '10px 16px';
-    aviso.style.borderRadius = '12px';
-    aviso.style.boxShadow = '0 10px 30px rgba(0,0,0,.5)';
-    aviso.style.zIndex = '9999';
-    document.body.appendChild(aviso);
+  texto += `\n💰 Total: ${totalEl.innerText}`;
 
-    setTimeout(() => aviso.remove(), 2000);
-  });
+  navigator.clipboard.writeText(texto);
+  showToast('Encomenda copiada ✔️');
+}
+
+function copiarMateriais(){
+  navigator.clipboard.writeText(buildMateriaisText());
+  showToast('Fabricação copiada ✔️');
 }
 
 render();
 calc();
-
-document.addEventListener('input', calc);
-document.querySelectorAll('input[name=parceria]').forEach(r => r.addEventListener('change', calc));
+document.addEventListener('input',calc);
+document.querySelectorAll('input[name=parceria]').forEach(r=>r.addEventListener('change',calc));
 </script>
 
 </body>
