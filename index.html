@@ -6,10 +6,7 @@
 <title>Bahamas - Tablet de Vendas</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
+* { box-sizing: border-box; }
 
 body{
   font-family:'Segoe UI', Arial, sans-serif;
@@ -38,15 +35,21 @@ h1{text-align:center;margin-bottom:4px;}
   margin-bottom:16px;
 }
 
-label{color:#cbd5f5;}
+label{color:#cbd5f5; display:block;}
 
-input[type=text], input[type=number]{
+input[type=text], input[type=number], textarea{
   width:100%;
   padding:10px;
   border-radius:10px;
   border:1px solid #1e293b;
   background:#020617;
   color:#e5e7eb;
+  outline:none;
+}
+
+textarea{
+  min-height:84px;
+  resize:vertical;
 }
 
 input[type=number]{width:80px;text-align:left;}
@@ -59,6 +62,7 @@ th,td{
 }
 th{color:#94a3b8;font-size:0.9rem;}
 
+/* Toggle padrão (parceria) */
 .toggle{
   display:flex;
   gap:20px;
@@ -66,6 +70,91 @@ th{color:#94a3b8;font-size:0.9rem;}
   flex-wrap:wrap;
 }
 
+/* ====== NOVO LAYOUT DO FORM ====== */
+.formGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+  margin-top:10px;
+}
+@media (max-width: 680px){
+  .formGrid{ grid-template-columns: 1fr; }
+}
+
+.field{ display:flex; flex-direction:column; gap:8px; }
+
+.priorityWrap{
+  margin-top:12px;
+}
+
+.priorityWrap .row{
+  margin-top:8px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.segment{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.segment input{ display:none; }
+
+.pill{
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid #1e293b;
+  background:#0b1220;
+  color:#e5e7eb;
+  cursor:pointer;
+  user-select:none;
+  transition:.15s;
+  font-size:.95rem;
+}
+
+.segment input:checked + .pill{
+  background:#2563eb;
+  border-color:#2563eb;
+}
+
+.segment input:checked + .pill.urgent{
+  background:#dc2626;
+  border-color:#dc2626;
+}
+
+.segment{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.segment input{ display:none; }
+
+.pill{
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:#e5e7eb;
+  cursor:pointer;
+  user-select:none;
+  transition:.15s;
+  font-size:.95rem;
+}
+
+.segment input:checked + .pill{
+  background:#2563eb;
+  border-color:#2563eb;
+}
+
+.segment input:checked + .pill.urgent{
+  background:#dc2626;
+  border-color:#dc2626;
+}
+
+/* Total */
 .total{
   font-size:1.6rem;
   text-align:center;
@@ -121,7 +210,7 @@ pre{
   border-radius:16px;
   font-size:1rem;
   font-weight:500;
-  box-shadow:0 10px 30px rgba(0,0,0,.6);
+  box-shadow:0 10px 30px rgba(0,0,0,.7);
   opacity:0;
   transition:all .3s ease;
   z-index:9999;
@@ -154,9 +243,7 @@ pre{
   box-shadow:0 20px 60px rgba(0,0,0,.65);
   padding:16px;
 }
-.modal h3{
-  margin:0 0 8px;
-}
+.modal h3{ margin:0 0 8px; }
 .modal p{
   margin:0 0 12px;
   color:#cbd5f5;
@@ -195,14 +282,46 @@ pre{
   <div class="subtitle">Tablet de Vendas & Fabricação</div>
 
   <div class="card">
-    <label>Nome do Cliente</label>
-    <input type="text" id="cliente" placeholder="Ex: TchuNay">
 
-    <label style="margin-top:10px">Telefone</label>
-    <input type="text" id="telefone" placeholder="000-000">
+    <div class="field">
+      <label>Nome do Cliente</label>
+      <input type="text" id="cliente" placeholder="Ex: TchuNay">
+    </div>
 
-    <label style="margin-top:10px">Área</label>
-    <input type="text" id="area" placeholder="Bahamas - 12">
+    <div class="formGrid">
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" id="telefone" placeholder="000-000">
+      </div>
+
+      <div class="field">
+        <label>Área</label>
+        <input type="text" id="area" placeholder="Bahamas - 12">
+      </div>
+    </div>
+
+<div class="priorityWrap">
+  <label>Prioridade</label>
+  <div class="row">
+    <div class="segment" role="radiogroup" aria-label="Prioridade">
+      <label>
+        <input type="radio" name="prioridade" value="Normal" checked>
+        <span class="pill">Normal</span>
+      </label>
+
+      <label>
+        <input type="radio" name="prioridade" value="Urgente">
+        <span class="pill urgent">Urgente</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+    <div class="field" style="margin-top:12px;">
+      <label>Observação</label>
+      <textarea id="observacao" placeholder="Local de entrega, horário disponível, detalhes..."></textarea>
+    </div>
+
   </div>
 
   <div class="card toggle">
@@ -286,7 +405,7 @@ const data = [
     min:3000,
     max:4000,
     mat:{ tecido:2, fio:4 },
-    craftQtd: 2 // cada craft gera 2 mochilas
+    craftQtd: 2
   },
   { name:'Placa', min:30000, max:40000, mat:{ plastico:4, aluminio:5 } },
   { name:'Rádio', min:3000, max:4000, mat:{ plastico:3, chip:2 } },
@@ -342,8 +461,6 @@ function buildMateriaisText(){
 
     const item = data[i];
     const receita = item.mat || {};
-
-    // crafts necessários (ex: mochila 2 por craft)
     const crafts = item.craftQtd ? Math.ceil(qtd / item.craftQtd) : qtd;
 
     for(const m in receita){
@@ -366,11 +483,15 @@ function buildEncomendaText(vendedorNome){
   const cliente = document.getElementById('cliente').value || 'Não informado';
   const telefone = document.getElementById('telefone').value || 'Não informado';
   const area = document.getElementById('area').value || 'Não informado';
+  const prioridade = (document.querySelector('input[name=prioridade]:checked')?.value) || 'Normal';
+  const obsRaw = document.getElementById('observacao').value || '';
+  const observacao = obsRaw.trim() ? obsRaw.trim() : 'Nenhuma';
+
   const vendedor = (vendedorNome && vendedorNome.trim()) ? vendedorNome.trim() : null;
 
   let texto = `📦 Encomenda - Bahamas\n`;
   if(vendedor) texto += `Vendedor: ${vendedor}\n`;
-  texto += `Cliente: ${cliente}\nTelefone: ${telefone}\nÁrea: ${area}\n\n`;
+  texto += `Cliente: ${cliente}\nTelefone: ${telefone}\nÁrea: ${area}\nPrioridade: ${prioridade}\nObservação: ${observacao}\n\n`;
 
   let temItem=false;
   document.querySelectorAll('#items tr').forEach(tr=>{
@@ -390,7 +511,8 @@ function buildEncomendaText(vendedorNome){
 function calc(){
   let total=0;
   document.querySelectorAll('#items tr').forEach((tr,i)=>{
-    const qtd = Number(tr.querySelector('.qty').value||0);
+    const qtyInput = tr.querySelector('.qty');
+    const qtd = Number(qtyInput.value||0);
     const p = price(data[i]);
     const sub = qtd*p;
 
@@ -404,7 +526,6 @@ function calc(){
 }
 
 function copiarResumo(){
-  // Copia sem vendedor (pra uso rápido). Registro no Discord exige vendedor.
   navigator.clipboard.writeText(buildEncomendaText(''));
   showToast('Encomenda copiada ✔️', 'success');
 }
@@ -430,12 +551,10 @@ vendedorEl.addEventListener('input', () => {
   btnConfirmarRegistro.disabled = vendedorEl.value.trim().length === 0;
 });
 
-// Fecha ao clicar fora do modal
 modalOverlay.addEventListener('click', (e) => {
   if(e.target === modalOverlay) fecharConfirmacaoRegistro();
 });
 
-// Fecha com ESC
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape' && modalOverlay.style.display === 'flex') fecharConfirmacaoRegistro();
 });
@@ -449,7 +568,6 @@ async function confirmarRegistroDiscord(){
     return;
   }
 
-  // opcional: evita registrar “em branco”
   let temItem = false;
   document.querySelectorAll('#items tr').forEach(tr=>{
     const qtd = Number(tr.querySelector('.qty').value||0);
@@ -480,7 +598,7 @@ async function confirmarRegistroDiscord(){
     showToast('Encomenda registrada no Discord ✔️', 'success');
   }catch(e){
     showToast('Erro ao enviar pro Discord ❌', 'error');
-    btnConfirmarRegistro.disabled = false; // permite tentar de novo
+    btnConfirmarRegistro.disabled = false;
   }finally{
     btnRegistrar.disabled = false;
   }
@@ -488,6 +606,7 @@ async function confirmarRegistroDiscord(){
 
 render();
 calc();
+
 document.addEventListener('input',calc);
 document.querySelectorAll('input[name=parceria]').forEach(r=>r.addEventListener('change',calc));
 </script>
