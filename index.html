@@ -392,10 +392,10 @@ pre{
 <script>
 const data = [
   { name:'Algema', min:40000, max:50000, mat:{ fio:3, prata:3 } },
-  { name:'C4', min:20000, max:35000, mat:{ polvora:8, plastico:8 } },
-  { name:'Capuz', min:20000, max:30000, mat:{ tecido:10, fio:4 } },
-  { name:'Celular', min:3000, max:4000, mat:{ plastico:2, chip:3 } },
-  { name:'Keycard', min:40000, max:50000, mat:{ plastico:12, chip:9 } },
+  { name:'C4', min:20000, max:35000, mat:{ polvora:5, plastico:5 } },
+  { name:'Capuz', min:20000, max:30000, mat:{ tecido:5, fio:5 } },
+  { name:'Celular', min:3000, max:4000, mat:{ plastico:1, chip:1 } },
+  { name:'Keycard', min:40000, max:50000, mat:{ plastico:10, chip:10 } },
   { name:'Laço', min:20000, max:30000, mat:{ tecido:8, fio:4 } },
   { name:'Lockpick', min:30000, max:40000, mat:{ plastico:4, prata:4 } },
   { name:'Masterpick', min:70000, max:80000, mat:{ ouro:4, plastico:4 } },
@@ -404,13 +404,13 @@ const data = [
     name:'Mochila',
     min:3000,
     max:4000,
-    mat:{ tecido:2, fio:4 },
+    mat:{ tecido:1, fio:1 },
     craftQtd: 2
   },
   { name:'Placa', min:30000, max:40000, mat:{ plastico:4, aluminio:5 } },
-  { name:'Rádio', min:3000, max:4000, mat:{ plastico:3, chip:2 } },
-  { name:'Rastreador', min:90000, max:100000, mat:{ chip:9, aluminio:12 } },
-  { name:'Roupas', min:3000, max:4000, mat:{ tecido:3, fio:3 } }
+  { name:'Rádio', min:3000, max:4000, mat:{ plastico:1, chip:1 } },
+  { name:'Rastreador', min:90000, max:100000, mat:{ chip:9, aluminio:9 } },
+  { name:'Roupas', min:3000, max:4000, mat:{ tecido:1, fio:1 } }
 ].sort((a,b)=>a.name.localeCompare(b.name));
 
 const tbody = document.getElementById('items');
